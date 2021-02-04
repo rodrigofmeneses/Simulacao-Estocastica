@@ -1,6 +1,11 @@
-## Repositório referente a disciplina de Simulação Estocástica 2020.2 UFC
+Simulação Estocástica
+---
 
-### Trabalho 3
+## Descrição
+
+Repositório referente a disciplina de Simulação Estocástica 2020.2 UFC
+
+## Trabalho 3
 
 ### Criar gerdores para as Variáveis Aleatórias utilizando o gerador uniforme mcl.
 (botar os links da wikipedia aqui)
