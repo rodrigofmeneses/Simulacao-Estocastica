@@ -5,6 +5,14 @@ Simulação Estocástica
 
 Repositório referente a disciplina de Simulação Estocástica 2020.2 UFC
 
+## Trabalho 1
+
+### Gerador uniforme utilizando o método de congruente linear
+
+## Trabalho 2
+
+### Estimar o valor de PI através de simulação, utilizando o gerador uniforme mcl.
+
 ## Trabalho 3
 
 ### Criar gerdores para as Variáveis Aleatórias utilizando o gerador uniforme mcl.
