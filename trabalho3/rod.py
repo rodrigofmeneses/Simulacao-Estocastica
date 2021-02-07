@@ -26,7 +26,7 @@ def binomial(n, p, a, b, m, seed):
     if p <= 0.:
         while True: yield 0
     c = p / (1-p)
-    while(True):
+    while True:
         random = next(u)
         pr = (1-p) ** n  #  função densidade
         ac = pr  #  função distribuição acumulada
@@ -39,9 +39,13 @@ def binomial(n, p, a, b, m, seed):
 
 def binomial_2(n, p, a, b, m, seed):
     b = bernoulli(p, a, b, m, seed)
-    while (True):
+    while True:
         yield sum([ next(b) for i in range(n)])
 
+def geometric(n, p, a, b, m, seed):
+    b = bernoulli(p, a, b, m, seed)
+    while True:
+        yield next((i for i in range(n) if next(b)), None)
 
 
 # Samples
@@ -75,9 +79,14 @@ def sample_binomial(n, p, size, pr=pr):
 def sample_binomial_2(n, p, size, pr=pr):
     b = binomial_2(n, p, pr['a'], pr['b'], pr['m'], pr['seed'])
     return [next(b) for i in range(size)]
-    
-print(sample_unif(5))
-print(sample_bernoulli(0.5, 5))
-print(sample_binomial(10,0.5, 5))
-print(sample_binomial_2(10,0.5, 5))
 
+def sample_geometric(n, p, size, pr=pr):
+    b = geometric(n, p, pr['a'], pr['b'], pr['m'], pr['seed'])
+    return [next(b) for i in range(size)]
+
+
+print("Uniform", sample_unif(5))
+print("Bernoulli", sample_bernoulli(0.5, 5))
+print("Binomial", sample_binomial(10,0.5, 5))
+#print(sample_binomial_2(10,0.5, 5))
+print("Geometric", sample_geometric(10, 0.5, 5))
