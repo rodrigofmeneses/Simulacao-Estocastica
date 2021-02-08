@@ -8,6 +8,8 @@
 Geradores de variáveis aleatórias.
 '''
 
+from math import log2, ceil
+
 ## Dicionário de valores padrões ##
 
 pr = { "a": 7**5,
@@ -49,25 +51,29 @@ def binomial2(n, p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     while True:
         yield sum([next(b) for i in range(n)])
 
-def geometric(n, p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
-    '''
-        Explicação:
-        next(([iterator]), [default])
-        seja itr = (i for i in range(n)), itr é um iterator,
-        logo o comando next(itr) como já vimos gerará
-        o próximo elemento desse iterator.
-
-        Já a expressão (i for i in range(n) if [statment]) é um filtro,
-        logo o iterador só gerará os elementos que passam nesse filtro.
-
-        Por fim o None, será lançado caso nenhum elemento passe no filtro.
-
-        A distribuição geométrica nos retornará quantas vezes
-        um lançamento de bernoulli falhou até que ocorra o primeiro sucesso.
-    '''
-    bl = bernoulli(p, a, b, m, seed)
+#  def geometric(n, p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+#      '''
+#          Explicação:
+#          next(([iterator]), [default])
+#          seja itr = (i for i in range(n)), itr é um iterator,
+#          logo o comando next(itr) como já vimos gerará
+#          o próximo elemento desse iterator.
+#
+#          Já a expressão (i for i in range(n) if [statment]) é um filtro,
+#          logo o iterador só gerará os elementos que passam nesse filtro.
+#
+#          Por fim o None, será lançado caso nenhum elemento passe no filtro.
+#
+#          A distribuição geométrica nos retornará quantas vezes
+#          um lançamento de bernoulli falhou até que ocorra o primeiro sucesso.
+#      '''
+#      bl = bernoulli(p, a, b, m, seed)
+#      while True:
+#          yield next((i for i in range(n) if next(bl)), None)
+def geometric(p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+    u = uniform(a,b,m,seed)
     while True:
-        yield next((i for i in range(n) if next(bl)), None)
+        yield ceil(log2(next(u)) / log2(1-p))
 
 
 def sample_uniform(size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
@@ -86,8 +92,8 @@ def sample_binomial2(n, p, size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"
     b = binomial2(n, p, a, b, m, seed)
     return [next(b) for i in range(size)]
 
-def sample_geometric(n, p, size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
-    b = geometric(n, p, a, b, m, seed)
+def sample_geometric(p, size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+    b = geometric(p, a, b, m, seed)
     return [next(b) for i in range(size)]
 
 #  print("uniform", sample_uniform(5))
