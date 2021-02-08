@@ -22,7 +22,7 @@ def uniform(a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
         yield random / m
 
 def bernoulli(p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
-    u = unif(a,b,m,seed)
+    u = uniform(a,b,m,seed)
     while(True):
         yield ( next(u) < p )
 
