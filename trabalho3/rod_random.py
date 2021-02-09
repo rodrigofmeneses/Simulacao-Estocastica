@@ -1,5 +1,5 @@
 import time
-from rod import uniform, bernoulli, binomial, geometric, pr
+from rod import uniform, bernoulli, binomial, geometric, triangular, weibull, pr
 
 
 class Random():
@@ -28,6 +28,14 @@ class Random():
     def geometric(self, p, size):
         g = geometric(p, self.a, self.b, self.m, self.seed)
         return [next(g) for i in range(size)]
+
+    def triangular(self, lower, upper, mode, size):
+        t = triangular(lower, upper, mode, self.a, self.b, self.m, self.seed)
+        return [next(t) for i in range(size)]
+
+    def weibull(self, alpha, beta, size):
+        w = weibull(alpha, beta, self.a, self.b, self.m, self.seed)
+        return [next(w) for i in range(size)]
 
 #  rd = Random()
 #

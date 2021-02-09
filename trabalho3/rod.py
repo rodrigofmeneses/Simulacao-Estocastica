@@ -8,7 +8,7 @@
 Geradores de variáveis aleatórias.
 '''
 
-from math import log2, ceil
+from math import log, log2, trunc, sqrt
 
 ## Dicionário de valores padrões ##
 
@@ -73,8 +73,29 @@ def binomial2(n, p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
 def geometric(p, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     u = uniform(a,b,m,seed)
     while True:
-        yield ceil(log2(next(u)) / log2(1-p))
+        yield 1 + trunc(log2(next(u)) / log2(1-p))
 
+def triangular(lower, upper, mode,
+               a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+    u = uniform(a,b,m,seed)
+    diff = upper - lower
+    right = upper - mode
+    left = mode - lower
+    mode_mp = left / diff
+    while True:
+        p = next(u)
+        if p < mode_mp:
+            yield lower + sqrt(p * diff * left)
+        else:
+            yield upper - sqrt((1 - p) * diff * right)
+
+def weibull(alpha, beta, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+    """
+    F(x) = 1 - exp{ -(x/beta)^alpha }
+    """
+    u = uniform(a,b,m,seed)
+    while True:
+        yield beta*( (-log( next(u) ))**(-alpha) )
 
 def sample_uniform(size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     u = uniform(a,b,m,seed)
@@ -95,6 +116,16 @@ def sample_binomial2(n, p, size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"
 def sample_geometric(p, size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     b = geometric(p, a, b, m, seed)
     return [next(b) for i in range(size)]
+
+def sample_triangular(lower, upper, mode,
+                      size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+    t = triangular(lower, upper, mode, a, b, m, seed)
+    return [next(t) for i in range(size)]
+
+def sample_weibull(alpha, beta, size,
+                   a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
+    w = weibull(alpha, beta, a, b, m, seed)
+    return [next(w) for i in range(size)]
 
 #  print("uniform", sample_uniform(5))
 #  print("Bernoulli", sample_bernoulli(0.5, 5))
