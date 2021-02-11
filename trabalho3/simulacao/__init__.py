@@ -7,7 +7,7 @@
 
 Geradores de variáveis aleatórias.
 '''
-
+import time
 from math import log, log2, trunc, sqrt
 
 ## Dicionário de valores padrões ##
@@ -97,6 +97,46 @@ def weibull(alpha, beta, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     while True:
         yield beta*( (-log( next(u) ))**(-alpha) )
 
+pr = { "a": 7**5,
+      "b": 2*(3**10) - 1,
+      "m": 2**31 - 1,
+      "seed": 123654 }
+
+class Random():
+
+    def __init__(self, a=7**5, b=2*(3**10) - 1, m=2**31 - 1, seed=time.time_ns()):
+        self.a = a
+        self.b = b
+        self.m = m
+        self.seed = seed
+
+    def set_seed(self, new_seed):
+        self.seed = new_seed
+
+    def uniform(self, size):
+        u = uniform(self.a, self.b, self.m, self.seed)
+        return [next(u) for i in range(size)]
+
+    def bernoulli(self, p, size):
+        bl = bernoulli(p, self.a, self.b, self.m, self.seed)
+        return [next(bl) for i in range(size)]
+
+    def binomial(self, n, p, size):
+        bl = binomial(n, p, self.a, self.b, self.m, self.seed)
+        return [next(bl) for i in range(size)]
+
+    def geometric(self, p, size):
+        g = geometric(p, self.a, self.b, self.m, self.seed)
+        return [next(g) for i in range(size)]
+
+    def triangular(self, lower, upper, mode, size):
+        t = triangular(lower, upper, mode, self.a, self.b, self.m, self.seed)
+        return [next(t) for i in range(size)]
+
+    def weibull(self, alpha, beta, size):
+        w = weibull(alpha, beta, self.a, self.b, self.m, self.seed)
+        return [next(w) for i in range(size)]
+
 def sample_uniform(size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     u = uniform(a,b,m,seed)
     return [next(u) for i in range(size)]
@@ -132,3 +172,4 @@ def sample_weibull(alpha, beta, size,
 #  print("Binomial", sample_binomial(10,0.5, 5))
 #  print(sample_binomial_2(10,0.5, 5))
 #  print("Geometric", sample_geometric(10, 0.2, 5))
+
