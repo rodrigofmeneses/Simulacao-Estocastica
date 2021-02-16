@@ -10,4 +10,5 @@ Geradores de variáveis aleatórias.
 
 from .geradores import *
 from .random import *
+from .sumario import *
 

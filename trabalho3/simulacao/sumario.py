@@ -1,14 +1,13 @@
 from .random import Random
-from math import sqrt
 from scipy import stats
 
 
 class Sumario():
     def __init__(self):
-        rd = Random()
+        self.rd = Random()
 
-    def binomial(self, n=10, p=10, size=1000):
-        sample_binomial = rd.binomial(n, p, size)
+    def binomial(self, n=10, p=0.5, size=1000):
+        sample_binomial = self.rd.binomial(n, p, size)
         # Valores Esperados
         #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
         esp = stats.binom.stats(n, p, moments='mvsk')
@@ -21,9 +20,10 @@ class Sumario():
 
         self.gerar_tabela(esp, obs)
         self.gerar_grafico(esp, obs)
+        return esp, obs
 
     def triangular(self, lower=0, upper=1, mode=0.5, size=1000):
-        sample_triangular = rd.triangular(lower, upper, mode, size)
+        sample_triangular = self.rd.triangular(lower, upper, mode, size)
         # Valores Esperados
         #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
         esp = stats.triang.stats(c=mode/(upper-lower), \
@@ -39,9 +39,10 @@ class Sumario():
 
         self.gerar_tabela(esp, obs)
         self.gerar_grafico(esp, obs)
+        return esp, obs
 
     def geometric(self, p=0.5, size=1000):
-        sample_geometric = rd.geometric(p, size)
+        sample_geometric = self.rd.geometric(p, size)
         # Valores Esperados
         #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
         esp = stats.geom.stats(p=p, loc=0, moments='mvsk')
@@ -54,9 +55,10 @@ class Sumario():
 
         self.gerar_tabela(esp, obs)
         self.gerar_grafico(esp, obs)
+        return esp, obs
 
     def weibull(self, alpha=1, beta=1, size=1000):
-        sample_weibull = rd.weibull(alpha, beta, size)
+        sample_weibull = self.rd.weibull(alpha, beta, size)
         # Valores Esperados
         #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
         esp = stats.weibull_min.stats(c=alpha, \
@@ -72,6 +74,7 @@ class Sumario():
 
         self.gerar_tabela(esp, obs)
         self.gerar_grafico(esp, obs)
+        return esp, obs
 
 
     def gerar_tabela(self, esp, obs):
