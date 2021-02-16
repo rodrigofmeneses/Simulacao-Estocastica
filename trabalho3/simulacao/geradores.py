@@ -85,7 +85,7 @@ def weibull(alpha, beta, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     """
     u = uniform(a,b,m,seed)
     while True:
-        yield beta*( (-log( next(u) ))**(-alpha) )
+        yield beta*( (-log( next(u) ))**(1/alpha) )
 
 def sample_uniform(size, a=pr["a"], b=pr["b"], m=pr["m"], seed=pr["seed"]):
     u = uniform(a,b,m,seed)
