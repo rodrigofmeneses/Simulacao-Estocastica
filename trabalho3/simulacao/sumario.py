@@ -4,35 +4,42 @@ from beautifultable import BeautifulTable
 from scipy import stats
 
 class Sumario():
-    def __init__(self):
-        self.rd = Random()
+    def __init__(self, rd=None, n_samples=3):
+        self.rd = Random() if rd == None else rd
+        self.n_samples = n_samples
 
-    def binomial(self, n=10, p=0.5, size=1000, n_samples=10):
+    def binomial(self, n=10, p=0.5, size=1000):
         # Valores Esperados
         #esperado = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
-        
+
         mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.binom.stats(n, p, moments='mvsk')
         median_esp = stats.binom.median(n, p)
         std_esp = stats.binom.std(n, p)
+        q1_esp = stats.binom.ppf(0.25, n, p)
+        q3_esp = stats.binom.ppf(0.75, n, p)
 
-        esperado = ['Teórica', mean_esp, median_esp, variance_esp, std_esp, kurtosis_esp, skewness_esp]
+        esperado = ['Teórica', n, mean_esp, median_esp, variance_esp, std_esp, kurtosis_esp,
+                    skewness_esp, q1_esp, q3_esp]
 
         # Valores Observados
         # obs = [mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs, skewness_obs]
-        
+
         # Amostras
         observados = []
-        for i in range(n_samples):
-            self.rd.seed = np.random.randint(10000)
+        for i in range(self.n_samples):
+            #  self.rd.seed = np.random.randint(10000)
             sample_binomial = self.rd.binomial(n, p, size)
 
             _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_binomial)
-            median_obs = stats.median_abs_deviation(sample_binomial)
+            median_obs = np.median(sample_binomial)
             std_obs = np.sqrt(variance_obs)
-            
-            observados.append([self.rd.seed, mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs, skewness_obs])
+            q1_obs = np.quantile(sample_binomial, 0.25)
+            q3_obs = np.quantile(sample_binomial, 0.75)
 
-        self.gerar_tabela(esperado, observados)
+            observados.append([i+1, n, mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs,
+                               skewness_obs, q1_obs, q3_obs])
+
+        return self.gerar_tabela(esperado, observados)
         # self.gerar_grafico(esp, obs)
         # return esp, obs
 
@@ -47,7 +54,7 @@ class Sumario():
 
         # Valores Observados
         # obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
-        
+
         _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_triangular)
         obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
 
@@ -63,7 +70,7 @@ class Sumario():
 
         # Valores Observados
         # obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
-        
+
         _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_geometric)
         obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
 
@@ -82,7 +89,7 @@ class Sumario():
 
         # Valores Observados
         # obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
-        
+
         _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_weibull)
         obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
 
@@ -91,16 +98,21 @@ class Sumario():
         return esp, obs
 
 
-    def gerar_tabela(self, esperado, observados, mean_stats=None, n_samples=None):
+    def gerar_tabela(self, esperado, observados, mean_stats=None):
         table = BeautifulTable()
-        table.columns.header = ['Amostras', 'mean', 'median', 'variance', 'std', 'kurtosis', 'skewness']
+        table.set_style(BeautifulTable.STYLE_COMPACT)
+        table.columns.header = ['Amostras', 'size', 'mean', 'median', 'variance', 'std', 'kurtosis', 'skewness', 'Q1', 'Q3']
         table.rows.append(esperado)
         for row in observados:
             table.rows.append(row)
-        print(table)
+        media = ['Média']
+        columns = np.array(table.columns)[1:].astype(np.double)
+        media.extend(columns.mean(axis=1))
+        table.rows.append(media)
+        return table
 
     def gerar_grafico(self, esp, obs):
         pass
 
 
-        
+

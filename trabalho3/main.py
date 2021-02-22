@@ -1,6 +1,6 @@
 import simulacao as sim
 
-sm = sim.sumario.Sumario()
+sm = sim.sumario.Sumario(n_samples=3)
 
 # esp, obs = sm.binomial(size=100000)
 # print('\nBinomial')
@@ -19,4 +19,5 @@ sm = sim.sumario.Sumario()
 # print('Esp: ', esp)
 # print('Obs: ', obs)
 
-sm.binomial(n_samples=10)
+print(sm.binomial(1000))
+
