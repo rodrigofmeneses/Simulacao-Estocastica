@@ -9,94 +9,94 @@ class Sumario():
         self.n_samples = n_samples
 
     def binomial(self, n=10, p=0.5, size=1000):
-        # Valores Esperados
-        #esperado = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
-
         mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.binom.stats(n, p, moments='mvsk')
         median_esp = stats.binom.median(n, p)
         std_esp = stats.binom.std(n, p)
         q1_esp = stats.binom.ppf(0.25, n, p)
         q3_esp = stats.binom.ppf(0.75, n, p)
 
-        esperado = ['Teórica', n, mean_esp, median_esp, variance_esp, std_esp, kurtosis_esp,
-                    skewness_esp, q1_esp, q3_esp]
-
-        # Valores Observados
-        # obs = [mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs, skewness_obs]
+        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+                    kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
         # Amostras
         observados = []
         for i in range(self.n_samples):
-            #  self.rd.seed = np.random.randint(10000)
             sample_binomial = self.rd.binomial(n, p, size)
+            sample_summary = self.describe(sample_binomial)
+            sample_summary.insert(0, i)
+            observados.append(sample_summary)
 
-            _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_binomial)
-            median_obs = np.median(sample_binomial)
-            std_obs = np.sqrt(variance_obs)
-            q1_obs = np.quantile(sample_binomial, 0.25)
-            q3_obs = np.quantile(sample_binomial, 0.75)
+        return esperado, observados
 
-            observados.append([i+1, n, mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs,
-                               skewness_obs, q1_obs, q3_obs])
+    def triangular(self, lower=0., upper=1., mode=0.5, size=1000):
+        scale = upper-lower
+        c = mode/scale
+        loc = lower
+        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.triang.stats(c, loc, scale, moments='mvsk')
 
-        return self.gerar_tabela(esperado, observados)
-        # self.gerar_grafico(esp, obs)
-        # return esp, obs
+        median_esp = stats.triang.median(c, loc, scale)
+        std_esp = stats.triang.std(c, loc, scale)
+        q1_esp = stats.triang.ppf(0.25, c, loc, scale)
+        q3_esp = stats.triang.ppf(0.75, c, loc, scale)
 
-    def triangular(self, lower=0, upper=1, mode=0.5, size=1000):
-        sample_triangular = self.rd.triangular(lower, upper, mode, size)
-        # Valores Esperados
-        #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
-        esp = stats.triang.stats(c=mode/(upper-lower), \
-                                 loc=lower, \
-                                 scale=(upper-lower), \
-                                 moments='mvsk')
+        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+                    kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
-        # Valores Observados
-        # obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
+        # Amostras
+        observados = []
+        for i in range(self.n_samples):
+            sample_triangular = self.rd.triangular(lower, upper, mode, size)
+            sample_summary = self.describe(sample_triangular)
+            sample_summary.insert(0, i)
+            observados.append(sample_summary)
 
-        _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_triangular)
-        obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
-
-        self.gerar_tabela(esp, obs)
-        self.gerar_grafico(esp, obs)
-        return esp, obs
+        return esperado, observados
 
     def geometric(self, p=0.5, size=1000):
-        sample_geometric = self.rd.geometric(p, size)
-        # Valores Esperados
-        #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
-        esp = stats.geom.stats(p=p, loc=0, moments='mvsk')
+        loc=0
+        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.geom.stats(p, loc, moments='mvsk')
 
-        # Valores Observados
-        # obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
+        median_esp = stats.geom.median(p, loc)
+        std_esp = stats.geom.std(p, loc)
+        q1_esp = stats.geom.ppf(0.25, p, loc)
+        q3_esp = stats.geom.ppf(0.75, p, loc)
 
-        _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_geometric)
-        obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
+        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+                    kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
-        self.gerar_tabela(esp, obs)
-        self.gerar_grafico(esp, obs)
-        return esp, obs
+        # Amostras
+        observados = []
+        for i in range(self.n_samples):
+            sample_geometric = self.rd.geometric(p, size)
+            sample_summary = self.describe(sample_geometric)
+            sample_summary.insert(0, i)
+            observados.append(sample_summary)
+
+        return esperado, observados
 
     def weibull(self, alpha=1, beta=1, size=1000):
-        sample_weibull = self.rd.weibull(alpha, beta, size)
-        # Valores Esperados
-        #esp = [mean_esp, variance_esp, skewness_esp, kurtosis_esp]
-        esp = stats.weibull_min.stats(c=alpha, \
-                                      loc=0, \
-                                      scale=beta, \
-                                      moments='mvsk')
+        c = alpha
+        loc = 0
+        scale = beta
+        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.weibull_min.stats(c, loc, scale, moments='mvsk')
 
-        # Valores Observados
-        # obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
+        median_esp = stats.weibull_min.median(c, loc, scale)
+        std_esp = stats.weibull_min.std(c, loc, scale)
+        q1_esp = stats.weibull_min.ppf(0.25, c, loc, scale)
+        q3_esp = stats.weibull_min.ppf(0.75, c, loc, scale)
 
-        _, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample_weibull)
-        obs = [mean_obs, variance_obs, skewness_obs, kurtosis_obs]
+        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+                    kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
-        self.gerar_tabela(esp, obs)
-        self.gerar_grafico(esp, obs)
-        return esp, obs
+        # Amostras
+        observados = []
+        for i in range(self.n_samples):
+            sample_weibull = self.rd.weibull(alpha, beta, size)
+            sample_summary = self.describe(sample_weibull)
+            sample_summary.insert(0, i)
+            observados.append(sample_summary)
 
+        return esperado, observados
 
     def gerar_tabela(self, esperado, observados, mean_stats=None):
         table = BeautifulTable()
@@ -114,5 +114,13 @@ class Sumario():
     def gerar_grafico(self, esp, obs):
         pass
 
+    def describe(self, sample):
+        n, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample)
+        median_obs = np.median(sample)
+        std_obs = np.sqrt(variance_obs)
+        q1_obs = np.quantile(sample, 0.25)
+        q3_obs = np.quantile(sample, 0.75)
+
+        return [n, mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs, skewness_obs, q1_obs, q3_obs]
 
 
