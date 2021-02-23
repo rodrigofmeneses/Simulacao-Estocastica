@@ -2,6 +2,7 @@ import numpy as np
 from .random import Random
 from beautifultable import BeautifulTable
 from scipy import stats
+from scipy.special import gamma
 
 class Sumario():
     def __init__(self, rd=None, n_samples=3):
@@ -9,13 +10,18 @@ class Sumario():
         self.n_samples = n_samples
 
     def binomial(self, n=10, p=0.5, size=1000):
-        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.binom.stats(n, p, moments='mvsk')
-        median_esp = stats.binom.median(n, p)
-        std_esp = stats.binom.std(n, p)
+        #  mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.binom.stats(n, p, moments='mvsk')
+        mean_esp = n*p
+        variance_esp = n*p*(1.-p)
+        skewness_esp = ((1.-p) - p) / np.sqrt(variance_esp)
+        kurtosis_esp = (1.- 6*p*(1.-p)) / variance_esp
+        median_esp = np.trunc(n*p)
+        mode_esp = np.trunc( (n+1.)*p )
+        std_esp = np.sqrt(variance_esp)
         q1_esp = stats.binom.ppf(0.25, n, p)
         q3_esp = stats.binom.ppf(0.75, n, p)
 
-        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+        esperado = ['Teórica', size, mean_esp, mode_esp, median_esp, variance_esp, std_esp,
                     kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
         # Amostras
@@ -32,14 +38,20 @@ class Sumario():
         scale = upper-lower
         c = mode/scale
         loc = lower
-        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.triang.stats(c, loc, scale, moments='mvsk')
+        #  mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.triang.stats(c, loc, scale, moments='mvsk')
 
+        mean_esp = (lower + upper + mode) / 3.
+        variance_esp = (lower**2 + upper**2 + mode**2 - lower*upper - lower*mode - upper*mode)/18.
+        skewness_esp = np.sqrt(2)*((lower+upper-2*mode)*(2*lower-upper-mode)*(lower-2*upper+mode)) / \
+            ((lower**2 + upper**2 + mode**2 - lower*upper - lower*mode - upper*mode)**1.5)
+        kurtosis_esp = -(3./5.)
         median_esp = stats.triang.median(c, loc, scale)
-        std_esp = stats.triang.std(c, loc, scale)
+        mode_esp = mode
+        std_esp = np.sqrt(variance_esp)
         q1_esp = stats.triang.ppf(0.25, c, loc, scale)
         q3_esp = stats.triang.ppf(0.75, c, loc, scale)
 
-        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+        esperado = ['Teórica', size, mean_esp, mode_esp, median_esp, variance_esp, std_esp,
                     kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
         # Amostras
@@ -54,14 +66,19 @@ class Sumario():
 
     def geometric(self, p=0.5, size=1000):
         loc=0
-        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.geom.stats(p, loc, moments='mvsk')
+        #  mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.geom.stats(p, loc, moments='mvsk')
 
-        median_esp = stats.geom.median(p, loc)
-        std_esp = stats.geom.std(p, loc)
+        mean_esp = 1./p
+        variance_esp = (1.-p)/p**2
+        skewness_esp = (2.-p)/np.sqrt(1.-p)
+        kurtosis_esp = 6. + p**2/(1.-p)
+        median_esp = np.ceil(-1./np.log2(1.-p))
+        mode_esp = 1
+        std_esp = np.sqrt(variance_esp)
         q1_esp = stats.geom.ppf(0.25, p, loc)
         q3_esp = stats.geom.ppf(0.75, p, loc)
 
-        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+        esperado = ['Teórica', size, mean_esp, mode_esp, median_esp, variance_esp, std_esp,
                     kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
         # Amostras
@@ -78,14 +95,20 @@ class Sumario():
         c = alpha
         loc = 0
         scale = beta
-        mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.weibull_min.stats(c, loc, scale, moments='mvsk')
+        #  mean_esp, variance_esp, skewness_esp, kurtosis_esp = stats.weibull_min.stats(c, loc, scale, moments='mvsk')
 
+        mean_esp = beta*gamma(1.+1./alpha)
+        variance_esp = beta**2 * (gamma(1.+2./alpha)-gamma(1.+1./alpha)**2)
         median_esp = stats.weibull_min.median(c, loc, scale)
-        std_esp = stats.weibull_min.std(c, loc, scale)
+        mode_esp = beta * ( (alpha-1)/alpha )**(1/alpha) if alpha>1 else 0
+        std_esp = np.sqrt(variance_esp)
+        skewness_esp = (gamma(1.+3./alpha)*(beta**3) - 3.*mean_esp*variance_esp -mean_esp**3)/std_esp**3
+        kurtosis_esp = (beta**4 * gamma(1.+4./alpha)-4.*skewness_esp*(std_esp**3)*mean_esp \
+                                -6.*(mean_esp**2)*variance_esp - mean_esp**4)/(variance_esp**2) - 3.
         q1_esp = stats.weibull_min.ppf(0.25, c, loc, scale)
         q3_esp = stats.weibull_min.ppf(0.75, c, loc, scale)
 
-        esperado = ['Teórica', size, mean_esp, median_esp, variance_esp, std_esp,
+        esperado = ['Teórica', size, mean_esp, mode_esp, median_esp, variance_esp, std_esp,
                     kurtosis_esp, skewness_esp, q1_esp, q3_esp]
 
         # Amostras
@@ -101,13 +124,13 @@ class Sumario():
     def gerar_tabela(self, esperado, observados, mean_stats=None):
         table = BeautifulTable()
         table.set_style(BeautifulTable.STYLE_COMPACT)
-        table.columns.header = ['Amostras', 'size', 'mean', 'median', 'variance', 'std', 'kurtosis', 'skewness', 'Q1', 'Q3']
+        table.columns.header = ['Amostras', 'size', 'mean', 'mode', 'median', 'variance', 'std', 'kurtosis', 'skewness', 'Q1', 'Q3']
         table.rows.append(esperado)
         for row in observados:
             table.rows.append(row)
         media = ['Média']
         columns = np.array(table.columns)[1:].astype(np.double)
-        media.extend(columns.mean(axis=1))
+        media.extend(columns[:,1:].mean(axis=1))
         table.rows.append(media)
         return table
 
@@ -117,10 +140,12 @@ class Sumario():
     def describe(self, sample):
         n, _, mean_obs, variance_obs, skewness_obs, kurtosis_obs = stats.describe(sample)
         median_obs = np.median(sample)
+        mode_obs, weights = stats.mode(sample)
+        mode_obs = np.average(mode_obs, weights=weights)
         std_obs = np.sqrt(variance_obs)
         q1_obs = np.quantile(sample, 0.25)
         q3_obs = np.quantile(sample, 0.75)
 
-        return [n, mean_obs, median_obs, variance_obs, std_obs, kurtosis_obs, skewness_obs, q1_obs, q3_obs]
+        return [n, mean_obs, mode_obs, median_obs, variance_obs, std_obs, kurtosis_obs, skewness_obs, q1_obs, q3_obs]
 
 
