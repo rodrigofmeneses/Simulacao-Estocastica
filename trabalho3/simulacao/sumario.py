@@ -1,6 +1,6 @@
 import numpy as np
 from .random import Random
-from beautifultable import BeautifulTable
+#  from beautifultable import BeautifulTable
 from scipy import stats
 from scipy.special import gamma
 
@@ -122,16 +122,18 @@ class Sumario():
         return esperado, observados
 
     def gerar_tabela(self, esperado, observados, mean_stats=None):
-        table = BeautifulTable()
-        table.set_style(BeautifulTable.STYLE_COMPACT)
-        table.columns.header = ['Amostras', 'size', 'mean', 'mode', 'median', 'variance', 'std', 'kurtosis', 'skewness', 'Q1', 'Q3']
-        table.rows.append(esperado)
-        for row in observados:
-            table.rows.append(row)
+        #  table = BeautifulTable()
+        #  table.set_style(BeautifulTable.STYLE_COMPACT)
+        #  table.columns.header = ['Amostras', 'size', 'mean', 'mode', 'median', 'variance', 'std', 'kurtosis', 'skewness', 'Q1', 'Q3']
+        #  table.rows.append(esperado)
+        table = []
+        table.append(esperado)
+        table.extend(observados)
+        #  for row in observados:
+            #  table.rows.append(row)
         media = ['Média']
-        columns = np.array(table.columns)[1:].astype(np.double)
-        media.extend(columns[:,1:].mean(axis=1))
-        table.rows.append(media)
+        media.extend(np.mean(table[:][1:], axis=0))
+        table.append(media)
         return table
 
     def gerar_grafico(self, esp, obs):
