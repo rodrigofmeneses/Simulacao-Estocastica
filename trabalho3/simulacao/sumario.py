@@ -131,8 +131,8 @@ class Sumario():
         table.extend(observados)
         #  for row in observados:
             #  table.rows.append(row)
-        media = ['Média']
-        media.extend(np.mean(table[:][1:], axis=0))
+        media = np.mean(table[1:], axis=0).tolist()
+        media[0] = 'Média'
         table.append(media)
         return table
 
